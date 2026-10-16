@@ -1,0 +1,1809 @@
+/*
+ * Jellify — a cinematic, Netflix-inspired skin for Jellyfin Web 12+
+ * Pure CSS: no scripts, remote fonts, image dependencies, or plugins.
+ *
+ * Install: paste this whole file into Dashboard → Branding → Custom CSS.
+ * The styles target Jellyfin Web's v12 Modern layout and its existing detail/player views.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* 01. Design tokens                                                          */
+/* -------------------------------------------------------------------------- */
+
+:root,
+[data-theme] {
+    color-scheme: dark;
+
+    --jellify-bg: #090909;
+    --jellify-bg-raised: #141414;
+    --jellify-surface: #1c1c1c;
+    --jellify-surface-raised: #242424;
+    --jellify-line: rgba(255, 255, 255, 0.12);
+    --jellify-line-soft: rgba(255, 255, 255, 0.075);
+    --jellify-text: #f5f5f1;
+    --jellify-text-muted: #b3b3b3;
+    --jellify-text-subtle: #858585;
+    --jellify-red: #e50914;
+    --jellify-red-hover: #f6121d;
+    --jellify-red-deep: #b20710;
+    --jellify-radius: 0.35rem;
+    --jellify-motion: 220ms;
+    --jellify-ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+
+    /* Jellyfin 12 / MUI palette variables. Keep the channel variables in sync:
+       Jellyfin uses them for selected, hover and focus states. */
+    --jf-palette-primary-main: var(--jellify-red);
+    --jf-palette-primary-light: #ff4650;
+    --jf-palette-primary-dark: var(--jellify-red-deep);
+    --jf-palette-primary-contrastText: #ffffff;
+    --jf-palette-primary-mainChannel: 229 9 20;
+    --jf-palette-primary-lightChannel: 255 70 80;
+    --jf-palette-primary-darkChannel: 178 7 16;
+    --jf-palette-secondary-main: var(--jellify-red);
+    --jf-palette-secondary-contrastText: #ffffff;
+    --jf-palette-secondary-mainChannel: 229 9 20;
+    --jf-palette-primary-contrastTextChannel: 255 255 255;
+    --jf-palette-secondary-contrastTextChannel: 255 255 255;
+    --jf-palette-background-default: var(--jellify-bg);
+    --jf-palette-background-defaultChannel: 9 9 9;
+    --jf-palette-background-paper: var(--jellify-bg-raised);
+    --jf-palette-background-paperChannel: 20 20 20;
+    --jf-palette-text-primary: var(--jellify-text);
+    --jf-palette-text-primaryChannel: 245 245 241;
+    --jf-palette-text-secondary: var(--jellify-text-muted);
+    --jf-palette-text-secondaryChannel: 179 179 179;
+    --jf-palette-divider: var(--jellify-line);
+    --jf-palette-action-hover: rgba(255, 255, 255, 0.075);
+    --jf-palette-action-focus: rgba(255, 255, 255, 0.12);
+    --jf-palette-action-selectedOpacity: 0.18;
+    --jf-palette-AppBar-defaultBg: rgba(9, 9, 9, 0.96);
+    --jf-palette-AppBar-transparentBg: rgba(9, 9, 9, 0.78);
+    --jf-palette-AppBar-gradient: linear-gradient(180deg, rgba(9, 9, 9, 0.96), rgba(9, 9, 9, 0.78));
+    --jf-card-borderRadius: var(--jellify-radius);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 02. Foundations, type and accessible interaction                           */
+/* -------------------------------------------------------------------------- */
+
+html,
+body,
+#reactRoot {
+    min-height: 100%;
+    background-color: var(--jellify-bg) !important;
+    color: var(--jellify-text);
+}
+
+html {
+    scrollbar-color: #4a4a4a #101010;
+    scrollbar-width: thin;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--jellify-text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body,
+.backgroundContainer,
+.nowPlayingPlaylist,
+.dialog,
+.page,
+.skinBody {
+    background-color: var(--jellify-bg) !important;
+}
+
+.backgroundContainer.withBackdrop {
+    opacity: 0.38;
+}
+
+::selection {
+    background: rgba(229, 9, 20, 0.72);
+    color: #fff;
+}
+
+::-webkit-scrollbar {
+    width: 0.55rem;
+    height: 0.55rem;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border: 2px solid var(--jellify-bg);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+a {
+    color: inherit;
+}
+
+button,
+input,
+select,
+textarea,
+.MuiButton-root {
+    font-family: inherit;
+}
+
+.MuiButton-root {
+    text-transform: none !important;
+}
+
+.MuiTypography-root,
+.MuiInputBase-root,
+.MuiInputLabel-root,
+.MuiListSubheader-root,
+.MuiTooltip-tooltip {
+    font-family: inherit;
+}
+
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus,
+[tabindex]:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.86);
+    outline-offset: 3px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline-color: #fff !important;
+    outline-width: 2px;
+}
+
+@supports selector(:focus-visible) {
+    button:focus:not(:focus-visible),
+    a:focus:not(:focus-visible),
+    input:focus:not(:focus-visible),
+    select:focus:not(:focus-visible),
+    textarea:focus:not(:focus-visible),
+    [tabindex]:focus:not(:focus-visible) {
+        outline: none;
+    }
+}
+
+.material-icons,
+.MuiSvgIcon-root {
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Keep Jellyfin's actual logo and server identity; the red tint is only an accent. */
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiStack-root > .MuiButton-root:first-of-type img {
+    filter: brightness(0) saturate(100%) invert(12%) sepia(94%) saturate(4964%) hue-rotate(349deg) brightness(97%) contrast(108%) drop-shadow(0 0 0.45rem rgba(229, 9, 20, 0.2));
+}
+
+/* -------------------------------------------------------------------------- */
+/* 03. Modern v12 navigation and legacy header fallback                       */
+/* -------------------------------------------------------------------------- */
+
+.MuiAppBar-root:not(.osdHeader) {
+    padding-top: env(safe-area-inset-top);
+    color: var(--jellify-text) !important;
+    background: linear-gradient(180deg, rgba(8, 8, 8, 0.88) 0%, rgba(8, 8, 8, 0.72) 72%, rgba(8, 8, 8, 0.62) 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+    box-shadow: none !important;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    transition: background-color var(--jellify-motion) ease, border-color var(--jellify-motion) ease;
+}
+
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type {
+    min-height: 4.4rem;
+    gap: 0.35rem;
+    padding-left: clamp(1rem, 4.2vw, 4.5rem);
+    padding-right: clamp(1rem, 4.2vw, 4.5rem);
+}
+
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiButton-root {
+    min-height: 2.55rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 0.3rem;
+    color: rgba(245, 245, 241, 0.79);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    transition: color var(--jellify-motion) ease, background-color var(--jellify-motion) ease;
+}
+
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiButton-root:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiButton-root.MuiButton-colorPrimary {
+    position: relative;
+    color: #fff !important;
+    background: transparent !important;
+    font-weight: 650;
+}
+
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiButton-root.MuiButton-colorPrimary::after {
+    position: absolute;
+    right: 0.65rem;
+    bottom: 0.14rem;
+    left: 0.65rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--jellify-red);
+    content: "";
+}
+
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiIconButton-root {
+    width: 2.65rem;
+    height: 2.65rem;
+    color: rgba(255, 255, 255, 0.88);
+    border-radius: 50%;
+    transition: background-color var(--jellify-motion) ease, transform var(--jellify-motion) var(--jellify-ease);
+}
+
+.MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiIconButton-root:hover {
+    background: rgba(255, 255, 255, 0.11);
+    transform: translateY(-1px);
+}
+
+.MuiAppBar-root .MuiAvatar-root {
+    width: 2.15rem;
+    height: 2.15rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Old/legacy Jellyfin header remains useful on a few v12 routes. */
+.skinHeader:not(.osdHeader) {
+    color: var(--jellify-text);
+    background: linear-gradient(180deg, rgba(8, 8, 8, 0.96), rgba(8, 8, 8, 0.78));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+.skinHeader:not(.osdHeader) .headerTabs,
+.skinHeader:not(.osdHeader) .emby-tabs {
+    color: var(--jellify-text-muted);
+}
+
+.skinHeader:not(.osdHeader) .emby-tab-button-active,
+.skinHeader:not(.osdHeader) .emby-tab-button:hover {
+    color: #fff !important;
+}
+
+.skinHeader:not(.osdHeader) .emby-tab-button-active::after {
+    background: var(--jellify-red) !important;
+}
+
+/* MUI mobile navigation drawer and menus. */
+.MuiDrawer-paper,
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiDialog-paper {
+    color: var(--jellify-text) !important;
+    background: rgba(18, 18, 18, 0.97) !important;
+    border: 1px solid var(--jellify-line-soft);
+    box-shadow: 0 20px 64px rgba(0, 0, 0, 0.58) !important;
+    -webkit-backdrop-filter: blur(22px);
+    backdrop-filter: blur(22px);
+}
+
+.MuiDrawer-paper {
+    border-radius: 0 0.9rem 0.9rem 0;
+    padding-top: env(safe-area-inset-top);
+}
+
+[dir="rtl"] .MuiDrawer-paper {
+    border-radius: 0.9rem 0 0 0.9rem;
+}
+
+.MuiListItemButton-root {
+    min-height: 2.8rem;
+    margin: 0.12rem 0.65rem;
+    border-radius: 0.45rem !important;
+    color: var(--jellify-text-muted);
+    transition: color var(--jellify-motion) ease, background-color var(--jellify-motion) ease, transform var(--jellify-motion) var(--jellify-ease);
+}
+
+.MuiListItemButton-root:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.MuiListItemButton-root.Mui-selected {
+    color: #fff !important;
+    background: rgba(229, 9, 20, 0.16) !important;
+}
+
+.MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+    color: var(--jellify-red);
+}
+
+.MuiDivider-root {
+    border-color: var(--jellify-line-soft) !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 04. Home, libraries and shelf rhythm                                       */
+/* -------------------------------------------------------------------------- */
+
+.homePage,
+.libraryPage,
+.pageWithAbsoluteTabs {
+    color: var(--jellify-text);
+}
+
+.homePage {
+    position: relative;
+    isolation: isolate;
+    padding-top: 0 !important;
+    overflow-x: hidden;
+    overflow-x: clip;
+}
+
+.homePage::before {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: min(62vh, 46rem);
+    background:
+        radial-gradient(ellipse at 12% 2%, rgba(126, 13, 21, 0.17), transparent 48%),
+        linear-gradient(180deg, rgba(18, 18, 18, 0.16), transparent 86%);
+    pointer-events: none;
+    content: "";
+}
+
+.homePage .sections {
+    position: relative;
+    z-index: 1;
+    padding-top: clamp(1.1rem, 3.3vh, 2.5rem);
+}
+
+.homePage .sections > .verticalSection,
+.homePage .sections > .section,
+.libraryPage .verticalSection {
+    margin-bottom: clamp(1.65rem, 3.4vw, 3.1rem);
+}
+
+.sectionTitleContainer,
+.sectionTitleContainer-cards {
+    display: flex;
+    align-items: center;
+    min-height: 2.2rem;
+    margin: 0 0 0.6rem !important;
+    padding-top: 0.3rem !important;
+}
+
+.sectionTitle,
+.sectionTitle-cards {
+    color: #f4f4f4;
+    font-size: clamp(1.15rem, 1.4vw, 1.55rem) !important;
+    font-weight: 680 !important;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.sectionTitleTextButton {
+    gap: 0.28rem;
+    align-items: center;
+    color: inherit !important;
+    transition: color var(--jellify-motion) ease;
+}
+
+.sectionTitleTextButton:hover {
+    color: #fff !important;
+}
+
+.sectionTitleTextButton > .material-icons,
+.sectionTitleTextButton > .MuiSvgIcon-root {
+    margin: 0 !important;
+    color: var(--jellify-red);
+    font-size: 1.1rem !important;
+    transition: transform var(--jellify-motion) var(--jellify-ease);
+}
+
+.sectionTitleTextButton:hover > .material-icons,
+.sectionTitleTextButton:hover > .MuiSvgIcon-root {
+    transform: translateX(3px);
+}
+
+[dir="rtl"] .sectionTitleTextButton:hover > .material-icons,
+[dir="rtl"] .sectionTitleTextButton:hover > .MuiSvgIcon-root {
+    transform: translateX(-3px);
+}
+
+.sectionTitleButton,
+.sectionTitleIconButton {
+    color: var(--jellify-text-muted) !important;
+    transition: color var(--jellify-motion) ease, background-color var(--jellify-motion) ease;
+}
+
+/* Keep the native scroller component's touch and remote-control behavior intact. */
+.emby-scroller-container {
+    padding-bottom: 0.35rem;
+}
+
+.emby-scroller {
+    padding-top: 0.5rem;
+    padding-bottom: 0.65rem;
+    scroll-padding-inline: 4.5vw;
+    -webkit-overflow-scrolling: touch;
+}
+
+.itemsContainer.scrollSlider {
+    align-items: flex-start;
+    gap: 0;
+}
+
+.itemsContainer.scrollSlider > .card > .cardBox {
+    margin: 0.45rem 0.48rem 0.65rem 0 !important;
+}
+
+.padded-left,
+.padded-right {
+    scroll-padding-inline: 4.5vw;
+}
+
+.verticalSection .sectionTitle + .itemsContainer,
+.verticalSection .sectionTitleContainer + .itemsContainer {
+    margin-top: 0.25rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 05. Artwork cards and progress                                            */
+/* -------------------------------------------------------------------------- */
+
+.card.card-hoverable {
+    contain: layout style !important;
+    overflow: visible;
+}
+
+.cardBox {
+    border-radius: var(--jellify-radius) !important;
+    transition:
+        transform 260ms var(--jellify-ease),
+        box-shadow 260ms var(--jellify-ease),
+        filter 260ms var(--jellify-ease) !important;
+}
+
+.cardBox.visualCardBox,
+.visualCardBox {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.cardScalable,
+.cardContent,
+.cardImageContainer,
+.cardBox:not(.visualCardBox) .cardPadder,
+.cardContent-shadow {
+    border-radius: var(--jellify-radius) !important;
+}
+
+.cardImageContainer {
+    overflow: hidden;
+    background-color: #1a1a1a;
+    box-shadow: 0 7px 22px rgba(0, 0, 0, 0.24);
+    transition: box-shadow 260ms var(--jellify-ease), filter 260ms var(--jellify-ease);
+}
+
+.defaultCardBackground {
+    color: rgba(255, 255, 255, 0.82);
+    background: linear-gradient(145deg, #292929, #111111) !important;
+}
+
+.cardImageContainer::after {
+    position: absolute;
+    z-index: 0;
+    inset: 35% 0 0;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.24));
+    pointer-events: none;
+    content: "";
+}
+
+.cardContent,
+.cardImage,
+.cardPadder {
+    transition: transform 360ms var(--jellify-ease), filter 360ms var(--jellify-ease);
+}
+
+.cardFooter {
+    padding: 0.48rem 0.05rem 0.15rem;
+    color: var(--jellify-text-muted);
+    text-align: left;
+}
+
+.cardText {
+    padding: 0.08rem 0 !important;
+    color: #e9e9e9;
+    font-size: 0.83rem;
+    font-weight: 550;
+    line-height: 1.35;
+}
+
+.cardText-secondary {
+    margin-top: 0.12rem;
+    color: var(--jellify-text-subtle);
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+.innerCardFooter {
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.84)) !important;
+}
+
+.innerCardFooter > .cardText {
+    padding: 0.48rem 0.55rem !important;
+}
+
+.cardImageIcon {
+    color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.cardOverlayButton {
+    color: #fff !important;
+    transition: transform var(--jellify-motion) var(--jellify-ease), opacity var(--jellify-motion) ease;
+}
+
+.cardOverlayButtonIcon {
+    color: #fff;
+    background: rgba(15, 15, 15, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.38);
+}
+
+.playedIndicator,
+.countIndicator,
+.videoIndicator,
+.missingIndicator,
+.unairedIndicator {
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
+}
+
+.playedIndicator {
+    color: #fff;
+    background: var(--jellify-red);
+}
+
+.itemProgressBar {
+    height: 3px !important;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.32) !important;
+    border-radius: 999px;
+}
+
+.itemProgressBarForeground,
+.mdl-slider-background-lower {
+    background-color: var(--jellify-red) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .card.card-hoverable:hover {
+        z-index: 12 !important;
+    }
+
+    .card.card-hoverable:hover > .cardBox {
+        transform: translateY(-0.2rem) scale(1.055);
+        filter: brightness(1.055);
+    }
+
+    .card.card-hoverable:hover .cardImageContainer {
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.58);
+    }
+
+    .card.card-hoverable:hover .cardImage {
+        transform: scale(1.035);
+    }
+}
+
+.card:focus-visible > .cardBox {
+    outline: 2px solid #fff !important;
+    outline-offset: 3px;
+}
+
+.card.show-focus > .cardBox {
+    outline: 2px solid #fff !important;
+    outline-offset: 3px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 06. Cinematic item details                                                 */
+/* -------------------------------------------------------------------------- */
+
+#itemDetailPage {
+    position: relative;
+    isolation: isolate;
+    overflow-x: hidden;
+    overflow-x: clip;
+    padding-top: 0 !important;
+}
+
+#itemDetailPage .itemBackdrop {
+    position: relative;
+    height: min(76vh, 54rem) !important;
+    min-height: 34rem;
+    margin-top: -4.4rem;
+    margin-top: calc(-4.4rem - env(safe-area-inset-top));
+    background-position: center 28%;
+    background-attachment: scroll !important;
+    background-size: cover;
+    animation: jf-backdrop-reveal 850ms var(--jellify-ease) both;
+}
+
+#itemDetailPage .itemBackdrop.personBackdrop {
+    background-color: var(--jellify-bg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+}
+
+#itemDetailPage .itemBackdrop::before,
+#itemDetailPage .itemBackdrop::after {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+}
+
+#itemDetailPage .itemBackdrop::before {
+    background: linear-gradient(90deg, rgba(9, 9, 9, 0.88) 0%, rgba(9, 9, 9, 0.48) 38%, rgba(9, 9, 9, 0.08) 76%);
+}
+
+#itemDetailPage .itemBackdrop::after {
+    background:
+        linear-gradient(180deg, rgba(9, 9, 9, 0.12) 0%, transparent 26%, rgba(9, 9, 9, 0.25) 50%, #090909 100%),
+        radial-gradient(ellipse at 75% 20%, transparent 0%, rgba(9, 9, 9, 0.12) 58%, rgba(9, 9, 9, 0.46) 100%);
+}
+
+#itemDetailPage .detailLogo:not(.hide) {
+    z-index: 2;
+    top: clamp(6.5rem, 17vh, 12rem);
+    right: auto;
+    left: clamp(2rem, 6.2vw, 7rem);
+    width: min(38vw, 35rem);
+    height: clamp(5rem, 15vh, 10rem);
+    background-position: left center;
+    background-size: contain;
+    filter: drop-shadow(0 4px 22px rgba(0, 0, 0, 0.46));
+}
+
+#itemDetailPage .detailRibbon {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    min-height: 31vh;
+    height: auto !important;
+    margin-top: -31vh !important;
+    padding: 0 clamp(1.5rem, 6.2vw, 7rem) 2.3rem !important;
+    box-sizing: border-box;
+}
+
+#itemDetailPage .detailRibbon .infoWrapper {
+    flex: 0 1 55rem;
+    max-width: min(100%, 55rem);
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+#itemDetailPage .itemBackdrop:not(.personBackdrop) ~ .detailPageWrapperContainer .detailImageContainer .card {
+    display: none !important;
+}
+
+#itemDetailPage .itemBackdrop.personBackdrop ~ .detailPageWrapperContainer .detailPagePrimaryContent {
+    padding-left: 32.45vw !important;
+}
+
+[dir="rtl"] #itemDetailPage .itemBackdrop.personBackdrop ~ .detailPageWrapperContainer .detailPagePrimaryContent {
+    padding-right: 32.45vw !important;
+    padding-left: 0 !important;
+}
+
+#itemDetailPage .detailRibbon .nameContainer {
+    max-width: 100%;
+}
+
+#itemDetailPage .itemName,
+#itemDetailPage h1.itemName {
+    max-width: 58rem;
+    margin: 0.12em 0 0.32em !important;
+    overflow: visible;
+    color: #fff;
+    font-size: clamp(2.4rem, 5.7vw, 5.5rem) !important;
+    font-weight: 760 !important;
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+    text-align: left;
+    text-shadow: 0 2px 26px rgba(0, 0, 0, 0.55);
+    white-space: normal;
+}
+
+#itemDetailPage .parentName {
+    margin: 0 0 0.35rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+    font-weight: 600;
+    text-align: left;
+}
+
+#itemDetailPage .itemMiscInfo {
+    gap: 0.15rem 0.42rem;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.93rem;
+    line-height: 1.5;
+    text-align: left;
+}
+
+#itemDetailPage .itemMiscInfo .mediaInfoItem {
+    color: inherit;
+}
+
+#itemDetailPage .itemMiscInfo .starRatingContainer,
+#itemDetailPage .itemMiscInfo .mediaInfoCriticRatingFresh {
+    color: #46d369;
+    font-weight: 700;
+}
+
+#itemDetailPage .mainDetailButtons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 1.2rem 0 0 !important;
+    padding: 0 !important;
+}
+
+#itemDetailPage .detailButton,
+#itemDetailPage .btnPlayOrResume {
+    min-width: 3rem;
+    min-height: 3rem;
+    margin: 0 !important;
+    padding: 0.72rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.27) !important;
+    border-radius: 0.38rem !important;
+    color: #fff !important;
+    background: rgba(30, 30, 30, 0.84) !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: transform var(--jellify-motion) var(--jellify-ease), background-color var(--jellify-motion) ease, border-color var(--jellify-motion) ease;
+}
+
+#itemDetailPage .detailButton:hover,
+#itemDetailPage .btnPlayOrResume:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.7) !important;
+    background: rgba(62, 62, 62, 0.92) !important;
+}
+
+#itemDetailPage .detailButton-content {
+    flex-direction: row;
+}
+
+#itemDetailPage .detailButton-icon {
+    font-size: 1.45rem !important;
+}
+
+#itemDetailPage .btnPlay:not(.hide),
+#itemDetailPage .btnReplay:not(.hide),
+#itemDetailPage .btnPlayOrResume {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-width: clamp(8.6rem, 13vw, 11.2rem);
+    min-height: 3.1rem;
+    padding: 0.72rem 1.25rem !important;
+    border: 0 !important;
+    color: #141414 !important;
+    background: #fff !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    font-size: 1rem;
+    font-weight: 720;
+    letter-spacing: 0.005em;
+    text-shadow: none;
+}
+
+#itemDetailPage .btnPlay:hover,
+#itemDetailPage .btnReplay:hover,
+#itemDetailPage .btnPlayOrResume:hover {
+    color: #111 !important;
+    background: #e6e6e6 !important;
+}
+
+#itemDetailPage .btnPlay::after,
+#itemDetailPage .btnReplay::after,
+#itemDetailPage .btnPlayOrResume::after {
+    content: attr(title);
+}
+
+#itemDetailPage .btnPlayOrResume svg {
+    font-size: 1.45rem;
+}
+
+#itemDetailPage .detailButton.btnPlaystate,
+#itemDetailPage .detailButton.btnUserRating {
+    border-radius: 999px !important;
+}
+
+#itemDetailPage .detailButton.btnUserRating {
+    color: #fff !important;
+}
+
+#itemDetailPage .detailPagePrimaryContent {
+    padding: 0 clamp(1.5rem, 6.2vw, 7rem) 0 !important;
+}
+
+#itemDetailPage .detailSectionContent {
+    max-width: 55rem;
+}
+
+#itemDetailPage .itemGenres {
+    margin: 0 0 0.85rem;
+    color: var(--jellify-text-muted);
+    font-size: 0.9rem;
+}
+
+#itemDetailPage .tagline {
+    margin: 0 0 0.75rem;
+    color: #fff;
+    font-size: clamp(1rem, 1.5vw, 1.3rem);
+    font-weight: 650;
+}
+
+#itemDetailPage .overview {
+    max-width: 52rem;
+    margin: 0;
+    color: rgba(245, 245, 241, 0.9);
+    font-size: clamp(0.97rem, 1.15vw, 1.08rem);
+    line-height: 1.7;
+}
+
+#itemDetailPage .overview-controls {
+    justify-content: flex-start;
+    margin-top: 0.55rem;
+}
+
+#itemDetailPage .overview-expand,
+#itemDetailPage .itemExternalLinks a,
+#itemDetailPage .itemTags a {
+    color: #fff !important;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+#itemDetailPage .overview-expand:hover,
+#itemDetailPage .itemExternalLinks a:hover,
+#itemDetailPage .itemTags a:hover {
+    color: #ff858b !important;
+}
+
+#itemDetailPage .detailPageSecondaryContainer {
+    padding: 2.2rem clamp(1.5rem, 6.2vw, 7rem) calc(5rem + env(safe-area-inset-bottom)) !important;
+}
+
+#itemDetailPage .detailVerticalSection,
+#itemDetailPage .itemDetailsGroup:not(:empty) {
+    margin-top: 2.3rem;
+    margin-bottom: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--jellify-line-soft);
+}
+
+#itemDetailPage .detailVerticalSection .sectionTitle,
+#itemDetailPage .itemDetailsGroup .sectionTitle {
+    padding-top: 0;
+    margin-bottom: 0.35rem;
+}
+
+#itemDetailPage .detailPageSecondaryContainer .sectionTitleContainer {
+    padding-left: 0 !important;
+}
+
+#itemDetailPage .detailPageSecondaryContainer .cardFooter {
+    color: var(--jellify-text-muted);
+}
+
+#itemDetailPage .itemDetailGalleryLink.defaultCardBackground {
+    background: linear-gradient(145deg, #2d2d2d, #111) !important;
+}
+
+#itemDetailPage .itemBackdropProgressBar {
+    z-index: 3;
+    height: 3px !important;
+    background: rgba(255, 255, 255, 0.24) !important;
+}
+
+#itemDetailPage .itemBackdropProgressBar .itemProgressBarForeground {
+    background: var(--jellify-red) !important;
+}
+
+[dir="rtl"] #itemDetailPage .detailLogo:not(.hide) {
+    right: clamp(2rem, 6.2vw, 7rem);
+    left: auto;
+    background-position: right center;
+}
+
+[dir="rtl"] #itemDetailPage .detailRibbon .infoWrapper,
+[dir="rtl"] #itemDetailPage .itemName,
+[dir="rtl"] #itemDetailPage h1.itemName,
+[dir="rtl"] #itemDetailPage .parentName,
+[dir="rtl"] #itemDetailPage .itemMiscInfo {
+    text-align: right;
+}
+
+@media (min-width: 601px) {
+    [dir="rtl"] #itemDetailPage .itemBackdrop:not(.personBackdrop)::before {
+        background: linear-gradient(270deg, rgba(9, 9, 9, 0.88) 0%, rgba(9, 9, 9, 0.48) 38%, rgba(9, 9, 9, 0.08) 76%);
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* 07. Buttons, fields, forms, lists and dialogs                              */
+/* -------------------------------------------------------------------------- */
+
+.emby-button,
+.button-flat,
+.paper-icon-button-light,
+.MuiButton-root,
+.MuiIconButton-root {
+    transition:
+        color var(--jellify-motion) ease,
+        background-color var(--jellify-motion) ease,
+        border-color var(--jellify-motion) ease,
+        box-shadow var(--jellify-motion) ease,
+        transform var(--jellify-motion) var(--jellify-ease);
+}
+
+.paper-icon-button-light {
+    border-radius: 999px;
+}
+
+.button-submit,
+.MuiButton-containedPrimary {
+    color: #fff !important;
+    background: var(--jellify-red) !important;
+}
+
+.button-submit:hover,
+.MuiButton-containedPrimary:hover {
+    background: var(--jellify-red-hover) !important;
+}
+
+.MuiButton-contained:not(.MuiButton-containedPrimary):not(.button-delete),
+.raised:not(.button-submit):not(.button-delete) {
+    color: #f4f4f4 !important;
+    background: #333 !important;
+}
+
+.MuiButton-contained:not(.MuiButton-containedPrimary):not(.button-delete):hover,
+.raised:not(.button-submit):not(.button-delete):hover {
+    background: #454545 !important;
+}
+
+.MuiTextField-root .MuiInputBase-root,
+.MuiFormControl-root .MuiInputBase-root,
+.emby-input,
+.emby-textarea,
+.emby-select {
+    color: var(--jellify-text) !important;
+    background-color: rgba(255, 255, 255, 0.065) !important;
+    border-color: rgba(255, 255, 255, 0.21) !important;
+    border-radius: 0.35rem !important;
+}
+
+.MuiTextField-root .MuiInputBase-root.Mui-focused,
+.MuiFormControl-root .MuiInputBase-root.Mui-focused,
+.emby-input:focus,
+.emby-textarea:focus,
+.emby-select:focus {
+    border-color: var(--jellify-red) !important;
+    box-shadow: 0 0 0 1px var(--jellify-red);
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border-color: rgba(255, 255, 255, 0.21) !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: rgba(255, 255, 255, 0.48) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--jellify-red) !important;
+    border-width: 2px;
+}
+
+.MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+    border-color: #ff777d !important;
+}
+
+.MuiInputBase-input::placeholder {
+    color: var(--jellify-text-subtle);
+    opacity: 1;
+}
+
+.MuiSelect-icon,
+.MuiInputAdornment-root {
+    color: var(--jellify-text-muted) !important;
+}
+
+.MuiInputLabel-root,
+.inputLabel,
+.inputLabelUnfocused,
+.textareaLabelUnfocused,
+.selectLabel {
+    color: var(--jellify-text-muted) !important;
+}
+
+.MuiInputLabel-root.Mui-focused,
+.inputLabelFocused,
+.selectLabelFocused,
+.textareaLabelFocused {
+    color: #ff737a !important;
+}
+
+.paperList,
+.paperList .listItem,
+.visualCardBox,
+.listItem-border {
+    border-color: var(--jellify-line-soft) !important;
+}
+
+.paperList {
+    color: var(--jellify-text);
+    background: rgba(255, 255, 255, 0.035) !important;
+    border-radius: 0.55rem;
+}
+
+.listItem:hover,
+.MuiListItemButton-root:hover {
+    background-color: rgba(255, 255, 255, 0.065) !important;
+}
+
+.dialog,
+.dialogContainer,
+.formDialog,
+.formDialogContent {
+    color: var(--jellify-text);
+    background: var(--jellify-bg-raised) !important;
+}
+
+.dialog,
+.MuiDialog-paper {
+    border-radius: 0.8rem !important;
+}
+
+.MuiBackdrop-root {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.toast,
+.MuiSnackbarContent-root {
+    color: #fff !important;
+    background: #252525 !important;
+    border: 1px solid var(--jellify-line-soft);
+    border-radius: 0.55rem !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5) !important;
+}
+
+.checkboxOutline {
+    border-color: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 0.22rem !important;
+}
+
+.checkboxListLabel,
+.checkboxLabel,
+.fieldDescription,
+.secondaryText,
+.MuiFormHelperText-root {
+    color: var(--jellify-text-muted) !important;
+}
+
+/* The small always-on-top music/video transport shares the same glass surface. */
+.appfooter {
+    pointer-events: none;
+}
+
+.nowPlayingBar {
+    margin: 0.55rem clamp(0.55rem, 2vw, 1.2rem);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 0.72rem;
+    background: rgba(22, 22, 22, 0.95);
+    box-shadow: 0 12px 38px rgba(0, 0, 0, 0.48);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    pointer-events: auto;
+}
+
+.nowPlayingBarTop {
+    height: 4.4rem;
+}
+
+.nowPlayingBar .nowPlayingImage {
+    width: 3.9rem;
+    height: 76%;
+    margin-left: 0.4rem;
+    border-radius: 0.25rem;
+}
+
+[dir="rtl"] .nowPlayingBar .nowPlayingImage {
+    margin-right: 0.4rem;
+    margin-left: 0;
+}
+
+.nowPlayingBarText {
+    color: #f2f2f2;
+}
+
+.nowPlayingBarPositionContainer {
+    top: -0.25rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 08. Full-screen playback / Jellyfin v12 OSD                                */
+/* -------------------------------------------------------------------------- */
+
+.videoPlayerContainer,
+#videoOsdPage {
+    background: #000 !important;
+}
+
+.htmlvideoplayer {
+    background: #000;
+}
+
+.osdHeader {
+    z-index: 1002 !important;
+    padding-top: env(safe-area-inset-top);
+    color: #fff !important;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.74), rgba(0, 0, 0, 0)) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.osdHeader .MuiToolbar-root {
+    min-height: 4.5rem;
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-left: max(1rem, env(safe-area-inset-left));
+}
+
+.osdHeader .MuiIconButton-root {
+    color: #fff;
+    background: rgba(20, 20, 20, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.videoOsdBottom {
+    z-index: 1001;
+    padding-top: 10rem;
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+    padding-bottom: calc(1.4rem + env(safe-area-inset-bottom));
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.96) 0%, rgba(0, 0, 0, 0.77) 34%, rgba(0, 0, 0, 0) 100%);
+}
+
+.osdControls {
+    max-width: 94rem;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.osdTitle {
+    color: #fff;
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.osdSecondaryMediaInfo,
+.osdPositionText,
+.osdDurationText,
+.osdTimeText {
+    color: rgba(255, 255, 255, 0.73);
+    font-size: 0.88rem;
+}
+
+.osdTextContainer {
+    margin-bottom: 0.55rem;
+    padding-left: 0;
+}
+
+.videoOsdBottom .buttons {
+    align-items: center;
+    gap: 0.3rem;
+    padding-top: 0.35rem;
+}
+
+.videoOsdBottom .paper-icon-button-light {
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: 0 0.12rem;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.105);
+    border: 1px solid rgba(255, 255, 255, 0.17);
+    border-radius: 50%;
+    transition: transform var(--jellify-motion) var(--jellify-ease), background-color var(--jellify-motion) ease;
+}
+
+.videoOsdBottom .paper-icon-button-light:hover {
+    transform: scale(1.07);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.videoOsdBottom .btnPause {
+    width: 3.35rem;
+    height: 3.35rem;
+    margin: 0 0.35rem;
+    color: #111;
+    background: #fff;
+    border-color: #fff;
+}
+
+.videoOsdBottom .btnPause:hover {
+    background: #e5e5e5;
+}
+
+.videoOsdBottom .btnPause .material-icons {
+    color: inherit;
+}
+
+.videoOsdBottom .mdl-slider-background-flex {
+    height: 0.26rem;
+    margin-top: -0.13rem;
+    border-radius: 99px;
+}
+
+.videoOsdBottom .mdl-slider-background-upper {
+    border-radius: 99px;
+}
+
+.videoOsdBottom .mdl-slider-background-lower {
+    border-radius: 99px;
+}
+
+.videoOsdBottom .mdl-slider::-webkit-slider-thumb {
+    background: #fff;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+}
+
+.videoOsdBottom .mdl-slider::-moz-range-thumb {
+    background: #fff;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+}
+
+.videoOsdBottom .endsAtText {
+    color: rgba(255, 255, 255, 0.76);
+    font-variant-numeric: tabular-nums;
+}
+
+.skip-button {
+    padding: 0.72rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 0.4rem;
+    color: #111;
+    background: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+}
+
+.skip-button:hover {
+    background: #e8e8e8;
+}
+
+.upNextContainer {
+    z-index: 1003;
+    right: max(1.2rem, env(safe-area-inset-right));
+    bottom: calc(1.2rem + env(safe-area-inset-bottom));
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.7rem;
+    background: rgba(20, 20, 20, 0.96);
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.56);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+}
+
+.upNextDialog-button {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 0.35rem;
+    background: #343434;
+    transition: background-color var(--jellify-motion) ease, transform var(--jellify-motion) var(--jellify-ease);
+}
+
+.upNextDialog-button:hover {
+    transform: translateY(-1px);
+    background: #4a4a4a;
+}
+
+.videoSubtitlesInner,
+.videoSecondarySubtitlesInner {
+    border-radius: 0.25rem;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.8);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.chapterThumbContainer {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.45rem;
+}
+
+.chapterThumbTextContainer {
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.82));
+}
+
+/* -------------------------------------------------------------------------- */
+/* 09. Motion                                                                  */
+/* -------------------------------------------------------------------------- */
+
+@keyframes jf-backdrop-reveal {
+    from {
+        opacity: 0.62;
+        transform: scale(1.012);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes jf-page-arrive {
+    from {
+        opacity: 0;
+        transform: translateY(0.45rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mainAnimatedPage:not(#videoOsdPage) {
+    animation: jf-page-arrive 360ms var(--jellify-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* 10. Tablet and iPhone / iPad layout                                         */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+    .MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type {
+        min-height: 3.8rem;
+        flex-wrap: nowrap !important;
+        padding-right: max(0.85rem, env(safe-area-inset-right));
+        padding-left: max(0.85rem, env(safe-area-inset-left));
+    }
+
+    .homePage .sections {
+        padding-top: 0.55rem;
+    }
+
+    #itemDetailPage .itemBackdrop {
+        height: 69vh !important;
+        min-height: 27rem;
+        margin-top: -3.8rem !important;
+        margin-top: calc(-3.8rem - env(safe-area-inset-top)) !important;
+        background-position: center 24%;
+    }
+
+    #itemDetailPage .detailLogo:not(.hide) {
+        top: 14vh;
+        left: 5vw;
+        width: min(46vw, 28rem);
+        height: 12vh;
+    }
+
+    #itemDetailPage .detailRibbon {
+        min-height: 29vh;
+        margin-top: -29vh !important;
+        padding-right: max(5vw, env(safe-area-inset-right)) !important;
+        padding-left: max(5vw, env(safe-area-inset-left)) !important;
+    }
+
+    #itemDetailPage .detailPagePrimaryContent,
+    #itemDetailPage .detailPageSecondaryContainer {
+        padding-right: max(5vw, env(safe-area-inset-right)) !important;
+        padding-left: max(5vw, env(safe-area-inset-left)) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    html,
+    body {
+        background-color: #080808 !important;
+    }
+
+    .MuiAppBar-root:not(.osdHeader) {
+        background: linear-gradient(180deg, rgba(8, 8, 8, 0.9), rgba(8, 8, 8, 0.72)) !important;
+        border-bottom-color: rgba(255, 255, 255, 0.035);
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+    }
+
+    .MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type {
+        min-height: 3.55rem;
+        flex-wrap: nowrap !important;
+        gap: 0.12rem;
+        padding-right: max(0.65rem, env(safe-area-inset-right));
+        padding-left: max(0.65rem, env(safe-area-inset-left));
+    }
+
+    .MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiIconButton-root {
+        width: 2.45rem;
+        height: 2.45rem;
+    }
+
+    .MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiButton-root {
+        min-height: 2.4rem;
+        padding: 0.35rem 0.48rem;
+        font-size: 0.83rem;
+    }
+
+    .homePage::before {
+        height: 42vh;
+        background:
+            radial-gradient(ellipse at 8% 0%, rgba(126, 13, 21, 0.15), transparent 55%),
+            linear-gradient(180deg, rgba(15, 15, 15, 0.18), transparent 92%);
+    }
+
+    .homePage .sections {
+        padding-top: 0.15rem;
+    }
+
+    .homePage .sections > .verticalSection,
+    .homePage .sections > .section,
+    .libraryPage .verticalSection {
+        margin-bottom: 1.65rem;
+    }
+
+    .sectionTitleContainer,
+    .sectionTitleContainer-cards {
+        min-height: 1.95rem;
+        margin-bottom: 0.42rem !important;
+        padding-right: max(1rem, env(safe-area-inset-right)) !important;
+        padding-left: max(1rem, env(safe-area-inset-left)) !important;
+    }
+
+    .sectionTitle,
+    .sectionTitle-cards {
+        font-size: 1.13rem !important;
+        letter-spacing: -0.02em;
+    }
+
+    .emby-scroller {
+        padding-right: max(1rem, env(safe-area-inset-right)) !important;
+        padding-left: max(1rem, env(safe-area-inset-left)) !important;
+    }
+
+    .itemsContainer.scrollSlider > .card > .cardBox {
+        margin-right: 0.48rem !important;
+    }
+
+    /* Preserve the native horizontal swipe rail; make poster cards feel spacious. */
+    .itemsContainer.scrollSlider > .portraitCard,
+    .itemsContainer.scrollSlider > .mixedPortraitCard {
+        flex: 0 0 37vw;
+        width: 37vw;
+        max-width: 11.5rem;
+        min-width: 7.2rem;
+    }
+
+    .itemsContainer.scrollSlider > .backdropCard,
+    .itemsContainer.scrollSlider > .mixedBackdropCard {
+        flex: 0 0 70vw;
+        width: 70vw;
+        max-width: 25rem;
+    }
+
+    .itemsContainer.scrollSlider > .squareCard,
+    .itemsContainer.scrollSlider > .mixedSquareCard {
+        flex: 0 0 34vw;
+        width: 34vw;
+        max-width: 10.5rem;
+    }
+
+    .cardFooter {
+        padding-top: 0.4rem;
+    }
+
+    .cardText {
+        font-size: 0.78rem;
+    }
+
+    #itemDetailPage .itemBackdrop {
+        height: 66vh !important;
+        min-height: 25rem;
+        margin-top: -3.55rem !important;
+        margin-top: calc(-3.55rem - env(safe-area-inset-top)) !important;
+        background-position: center 20%;
+    }
+
+    #itemDetailPage .itemBackdrop::before {
+        background: linear-gradient(180deg, rgba(8, 8, 8, 0.22) 0%, rgba(8, 8, 8, 0.02) 24%, rgba(8, 8, 8, 0.28) 56%, #080808 100%);
+    }
+
+    #itemDetailPage .itemBackdrop::after {
+        background: linear-gradient(90deg, rgba(8, 8, 8, 0.22), transparent 78%);
+    }
+
+    #itemDetailPage .detailLogo:not(.hide) {
+        top: 20vh;
+        left: max(1.1rem, env(safe-area-inset-left));
+        width: min(70vw, 23rem);
+        height: 10vh;
+    }
+
+    #itemDetailPage .detailRibbon {
+        display: flex !important;
+        align-items: flex-end;
+        min-height: 27vh;
+        margin-top: -27vh !important;
+        padding: 0 max(1.1rem, env(safe-area-inset-right)) 1.45rem max(1.1rem, env(safe-area-inset-left)) !important;
+    }
+
+    #itemDetailPage .detailRibbon .infoWrapper {
+        max-width: 100%;
+        text-align: left;
+    }
+
+    #itemDetailPage .itemName,
+    #itemDetailPage h1.itemName {
+        max-width: 100%;
+        margin: 0.05em 0 0.45em !important;
+        font-size: clamp(2.05rem, 9vw, 3.15rem) !important;
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+        text-align: left !important;
+    }
+
+    #itemDetailPage .parentName,
+    #itemDetailPage .itemMiscInfo {
+        justify-content: flex-start !important;
+        text-align: left !important;
+    }
+
+    #itemDetailPage .itemMiscInfo {
+        gap: 0.12rem 0.35rem;
+        font-size: 0.82rem;
+    }
+
+    #itemDetailPage .mainDetailButtons {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 0.48rem;
+        margin-top: 0.9rem !important;
+        overflow-x: auto;
+        padding: 0.2rem 0.1rem 0.35rem !important;
+        scrollbar-width: none;
+    }
+
+    #itemDetailPage .mainDetailButtons::-webkit-scrollbar {
+        display: none;
+    }
+
+    #itemDetailPage .btnPlay,
+    #itemDetailPage .btnReplay,
+    #itemDetailPage .btnPlayOrResume {
+        flex: 1 0 auto;
+        min-width: 7.6rem;
+        min-height: 2.85rem;
+        padding: 0.58rem 0.86rem !important;
+        font-size: 0.92rem;
+    }
+
+    #itemDetailPage .detailButton:not(.btnPlay):not(.btnReplay):not(.btnPlayOrResume) {
+        flex: 0 0 2.85rem;
+        width: 2.85rem;
+        min-width: 2.85rem;
+        min-height: 2.85rem;
+        padding: 0.55rem !important;
+    }
+
+    #itemDetailPage .detailPagePrimaryContent,
+    #itemDetailPage .itemBackdrop.personBackdrop ~ .detailPageWrapperContainer .detailPagePrimaryContent {
+        padding: 0 max(1.1rem, env(safe-area-inset-right)) 0 max(1.1rem, env(safe-area-inset-left)) !important;
+    }
+
+    #itemDetailPage .detailSectionContent {
+        max-width: none;
+    }
+
+    #itemDetailPage .overview {
+        font-size: 0.96rem;
+        line-height: 1.62;
+    }
+
+    #itemDetailPage .detailPageSecondaryContainer {
+        padding: 1.4rem max(1.1rem, env(safe-area-inset-right)) calc(5.5rem + env(safe-area-inset-bottom)) max(1.1rem, env(safe-area-inset-left)) !important;
+    }
+
+    #itemDetailPage .detailVerticalSection,
+    #itemDetailPage .itemDetailsGroup:not(:empty) {
+        margin-top: 1.75rem;
+        margin-bottom: 1.8rem;
+        padding-top: 0.9rem;
+    }
+
+    .appfooter .nowPlayingBar {
+        margin: 0.35rem 0.4rem;
+    }
+
+    .nowPlayingBarTop {
+        height: 3.8rem;
+    }
+
+    .nowPlayingBar .nowPlayingImage {
+        width: 3.25rem;
+        margin-left: 0.25rem;
+    }
+
+    [dir="rtl"] .nowPlayingBar .nowPlayingImage {
+        margin-right: 0.25rem;
+        margin-left: 0;
+    }
+
+    .nowPlayingBarText {
+        font-size: 0.84rem;
+    }
+
+    .upNextContainer {
+        right: max(0.65rem, env(safe-area-inset-right));
+        bottom: calc(0.65rem + env(safe-area-inset-bottom));
+        left: max(0.65rem, env(safe-area-inset-left));
+        width: auto;
+        margin: 0 !important;
+    }
+
+    .upNextDialog-title,
+    .upNextDialog-buttons {
+        width: auto;
+        max-width: 100%;
+    }
+
+    .skip-button {
+        margin-right: max(0.8rem, env(safe-area-inset-right));
+        font-size: 0.88rem;
+    }
+
+    .videoOsdBottom {
+        padding-top: 6.5rem;
+        padding-right: max(0.5rem, env(safe-area-inset-right));
+        padding-bottom: calc(0.8rem + env(safe-area-inset-bottom));
+        padding-left: max(0.5rem, env(safe-area-inset-left));
+    }
+
+    .osdControls {
+        padding: 0 0.1rem;
+    }
+
+    .videoOsdBottom .buttons {
+        gap: 0.06rem;
+        flex-wrap: nowrap;
+    }
+
+    .videoOsdBottom .paper-icon-button-light {
+        width: 2.45rem;
+        height: 2.45rem;
+        margin: 0;
+    }
+
+    .videoOsdBottom .btnPause {
+        width: 2.9rem;
+        height: 2.9rem;
+        margin: 0 0.12rem;
+    }
+
+    .osdTitle {
+        font-size: 1.05rem;
+    }
+
+    [dir="rtl"] #itemDetailPage .detailLogo:not(.hide) {
+        right: max(1.1rem, env(safe-area-inset-right));
+        left: auto;
+        background-position: right center;
+    }
+
+    [dir="rtl"] #itemDetailPage .detailRibbon .infoWrapper,
+    [dir="rtl"] #itemDetailPage .itemName,
+    [dir="rtl"] #itemDetailPage h1.itemName,
+    [dir="rtl"] #itemDetailPage .parentName,
+    [dir="rtl"] #itemDetailPage .itemMiscInfo {
+        text-align: right !important;
+    }
+
+    [dir="rtl"] #itemDetailPage .itemBackdrop.personBackdrop ~ .detailPageWrapperContainer .detailPagePrimaryContent {
+        padding-right: max(1.1rem, env(safe-area-inset-right)) !important;
+        padding-left: max(1.1rem, env(safe-area-inset-left)) !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type {
+        padding-right: max(0.4rem, env(safe-area-inset-right));
+        padding-left: max(0.4rem, env(safe-area-inset-left));
+    }
+
+    .MuiAppBar-root:not(.osdHeader) > .MuiToolbar-root:first-of-type .MuiIconButton-root {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+
+    .itemsContainer.scrollSlider > .portraitCard,
+    .itemsContainer.scrollSlider > .mixedPortraitCard {
+        flex-basis: 41vw;
+        width: 41vw;
+    }
+
+    .videoOsdBottom .paper-icon-button-light {
+        width: 2.2rem;
+        height: 2.2rem;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+    #itemDetailPage .itemBackdrop {
+        height: 84vh !important;
+        min-height: 20rem;
+    }
+
+    #itemDetailPage .detailRibbon {
+        min-height: 34vh;
+        margin-top: -34vh !important;
+    }
+
+    .videoOsdBottom {
+        padding-top: 5rem;
+        padding-bottom: calc(0.4rem + env(safe-area-inset-bottom));
+    }
+
+    .videoOsdBottom .osdSecondaryMediaInfo {
+        display: none;
+    }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+    .MuiDrawer-paper,
+    .MuiMenu-paper,
+    .MuiPopover-paper,
+    .MuiDialog-paper,
+    .nowPlayingBar {
+        background: rgba(18, 18, 18, 0.98) !important;
+    }
+}
